@@ -69,7 +69,7 @@ public class Taxation extends TaxBlock {
                     taxRate = 0;
                 }
                 paid.add(new TaxPaid(res * taxRate, "Finanzamt"));
-                taxableAfter.add(new Budget(res * (1 - taxRate)));
+                taxableAfter.add(TestBudget.getBudget("Netto", res * (1 - taxRate)));
             }
         };
         s_catalogue.add(t);
