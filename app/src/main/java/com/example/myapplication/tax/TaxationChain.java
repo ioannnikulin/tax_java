@@ -54,13 +54,20 @@ public class TaxationChain extends TaxBlock {
         if (ets.size() > 0) {
             cs.connect(et.getId(), ConstraintSet.TOP, ets.get(ets.size() - 1).getId(), ConstraintSet.BOTTOM, 20);
             cs.connect(et.getId(), ConstraintSet.START, ets.get(0).getId(), ConstraintSet.START);
-        } else { // never, unless someone removes header TextView
+        }/* else {
+            System.out.println("Warning: header TextView not found, the layout might go askew");
             cs.connect(et.getId(), ConstraintSet.TOP, layout.getId(), ConstraintSet.TOP, 20);
-        }
+        }*/
         ets.add(et);
         return tv;
     }
-    private ConstraintLayout drawFactors(CardView card) {
+    private CardView drawFactors(ConstraintLayout parent) {
+        CardView card = new CardView(parent.getContext());
+        card.setId(View.generateViewId());
+        card.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        parent.addView(card);
+        card.setContentPadding(20, 20, 20, 20);
+
         ConstraintLayout layout = new ConstraintLayout(card.getContext());
         layout.setId(View.generateViewId());
         card.addView(layout);
@@ -111,8 +118,6 @@ public class TaxationChain extends TaxBlock {
         Button btn_addFactor = new Button(card.getContext());
         btn_addFactor.setText("+");
         btn_addFactor.setId(View.generateViewId());
-        cs.constrainHeight(btn_addFactor.getId(), ConstraintSet.WRAP_CONTENT);
-        cs.constrainWidth(btn_addFactor.getId(), ConstraintSet.WRAP_CONTENT);
         btn_addFactor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,9 +130,15 @@ public class TaxationChain extends TaxBlock {
         cs.connect(btn_addFactor.getId(), ConstraintSet.BOTTOM, layout.getId(), ConstraintSet.BOTTOM);
 
         cs.applyTo(layout);
-        return layout;
+        return card;
     }
-    private ConstraintLayout drawInputs(CardView card) {
+    private CardView drawInputs(ConstraintLayout parent) {
+        CardView card = new CardView(parent.getContext());
+        card.setId(View.generateViewId());
+        card.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        parent.addView(card);
+        card.setContentPadding(20, 20, 20, 20);
+
         ConstraintLayout layout = new ConstraintLayout(card.getContext());
         layout.setId(View.generateViewId());
         card.addView(layout);
@@ -135,31 +146,38 @@ public class TaxationChain extends TaxBlock {
         ConstraintSet cs = new ConstraintSet();
         cs.clone(layout);
 
+        TextView h = new TextView(card.getContext());
+        h.setId(View.generateViewId());
+        h.setText("Incoming brutto:");
+        cs.constrainHeight(h.getId(), ConstraintSet.WRAP_CONTENT);
+        layout.addView(h);
+
         Barrier br = new Barrier(card.getContext());
         br.setId(View.generateViewId());
         br.setType(Barrier.RIGHT);
+        br.setReferencedIds(new int[]{h.getId()});
         layout.addView(br);
         // TODO: check whether it will update itself on adding new fields
 
-        Button btn_addFactor = new Button(card.getContext());
-        btn_addFactor.setText("*");
-        btn_addFactor.setId(View.generateViewId());
-        cs.constrainHeight(btn_addFactor.getId(), ConstraintSet.WRAP_CONTENT);
-        cs.constrainWidth(btn_addFactor.getId(), ConstraintSet.WRAP_CONTENT);
-        btn_addFactor.setOnClickListener(new View.OnClickListener() {
+        Button btn_addIncome = new Button(card.getContext());
+        btn_addIncome.setText("+");
+        btn_addIncome.setId(View.generateViewId());
+        cs.constrainHeight(btn_addIncome.getId(), ConstraintSet.WRAP_CONTENT);
+        cs.constrainWidth(btn_addIncome.getId(), ConstraintSet.WRAP_CONTENT);
+        btn_addIncome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "DUMMY: adding optional factor", Toast.LENGTH_LONG).show();
+                Toast.makeText(view.getContext(), "DUMMY: adding income", Toast.LENGTH_LONG).show();
             }
         });
-        layout.addView(btn_addFactor);
+        layout.addView(btn_addIncome);
 
         //cs.connect(btn_addFactor.getId(), ConstraintSet.START, ets.get(0).getId(), ConstraintSet.END, 20);
-        cs.connect(btn_addFactor.getId(), ConstraintSet.START, br.getId(), ConstraintSet.END, 20);
-        cs.connect(btn_addFactor.getId(), ConstraintSet.TOP, layout.getId(), ConstraintSet.TOP);
-        cs.connect(btn_addFactor.getId(), ConstraintSet.BOTTOM, layout.getId(), ConstraintSet.BOTTOM);
+        cs.connect(btn_addIncome.getId(), ConstraintSet.START, br.getId(), ConstraintSet.END, 20);
+        cs.connect(btn_addIncome.getId(), ConstraintSet.TOP, layout.getId(), ConstraintSet.TOP);
+        cs.connect(btn_addIncome.getId(), ConstraintSet.BOTTOM, layout.getId(), ConstraintSet.BOTTOM);
         cs.applyTo(layout);
-        return layout;
+        return card;
     }
     private ConstraintLayout drawNetto(CardView card) {//TODO: dummy
         ConstraintLayout l = new ConstraintLayout(card.getContext());
@@ -174,13 +192,8 @@ public class TaxationChain extends TaxBlock {
         return l;
     }
     public int draw(ConstraintLayout parent) {
-        CardView card = new CardView(parent.getContext());
-        card.setId(View.generateViewId());
-        parent.addView(card);
-        card.setContentPadding(20, 20, 20, 20);
-
-        ConstraintLayout factor_l = drawFactors(card);
-        //ConstraintLayout input_l = drawInputs(card);
+        CardView factor_card = drawFactors(parent);
+        CardView input_card = drawInputs(parent);
         /*ConstraintLayout taxation_l = drawTaxation(card);
         View output = drawNetto(card);
 
@@ -193,13 +206,20 @@ public class TaxationChain extends TaxBlock {
         cs.connect(input_l.getId(), ConstraintSet.START, factor_l.getId(), ConstraintSet.START);
 
 
-*/ConstraintSet cs = new ConstraintSet();
+*/
+
+        ConstraintSet cs = new ConstraintSet();
         cs.clone(parent);
-        //cs.connect(input_l.getId(), ConstraintSet.TOP, card.getId(), ConstraintSet.TOP);
-        cs.connect(factor_l.getId(), ConstraintSet.START, card.getId(), ConstraintSet.START);
-        //cs.connect(input_l.getId(), ConstraintSet.BOTTOM, input_l.getId(), ConstraintSet.TOP);
-        //cs.connect(input_l.getId(), ConstraintSet.START, card.getId(), ConstraintSet.START);
+        cs.connect(input_card.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+        cs.connect(input_card.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+        cs.connect(input_card.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+        cs.constrainWidth(input_card.getId(), ConstraintSet.WRAP_CONTENT);
+        cs.connect(factor_card.getId(), ConstraintSet.TOP, input_card.getId(), ConstraintSet.BOTTOM, 10);
+        cs.connect(factor_card.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+        cs.connect(factor_card.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+        cs.constrainWidth(factor_card.getId(), ConstraintSet.WRAP_CONTENT);
         cs.applyTo(parent);
+
         return 0; // TODO: id of entry point later
     }
     interface TaxChFun {
