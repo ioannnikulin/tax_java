@@ -118,6 +118,8 @@ public class TaxationChain extends TaxBlock {
         Button btn_addFactor = new Button(card.getContext());
         btn_addFactor.setText("+");
         btn_addFactor.setId(View.generateViewId());
+        cs.constrainHeight(btn_addFactor.getId(), ConstraintSet.WRAP_CONTENT);
+        cs.constrainWidth(btn_addFactor.getId(), ConstraintSet.WRAP_CONTENT);
         btn_addFactor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
