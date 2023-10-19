@@ -5,6 +5,9 @@ import java.util.*;
 public class Taxation extends TaxBlock {
     private String m_name;
     private String m_desc;
+    public String getDesc() {
+        return m_desc;
+    }
     private List<Budget> m_taxableAfter;
     private List<TaxPaid> m_taxesPaid;
     public List<Budget> m_input;
@@ -15,6 +18,10 @@ public class Taxation extends TaxBlock {
         m_taxableAfter = new ArrayList<>();
         m_taxesPaid = new ArrayList<>();
         m_input = new ArrayList<>();
+    }
+    public Taxation(Taxation t) {
+        this(t.m_name, t.m_desc);
+        m_applicator = t.m_applicator; // TODO: deep copy
     }
     interface TaxFun {
         void proceed(List<Budget> input, List<Factor> factors, List<TaxPaid> paid, List<Budget> taxableAfter);
